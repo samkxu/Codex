@@ -1,0 +1,16 @@
+<!doctype html>
+<html ng-app="ace">
+<head>
+  <meta charset="utf-8">
+  <title>AngularJS Plunker</title>
+  
+  <link rel="stylesheet" href="css/style.css">
+  <script src="http://ajaxorg.github.io/ace-builds/src/ace.js"></script>
+  <script src="http://code.angularjs.org/1.1.4/angular.js"></script>
+  <script src="js/acefeed.js"></script>
+</head>
+<body ng-controller="MainCtrl">
+  <textarea ng-model="document"></textarea>
+  <ace-editor ng-model="document"></ace-editor>
+</body>
+</html>

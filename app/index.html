@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" ng-app>
+<head>
+  <meta charset="utf-8">
+  <title>Google Phone Gallery</title>
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/bootstrap.css">
+  <script src="lib/angular/angular.js"></script>
+  <script src="js/controllers.js"></script>
+  <style type="text/css" media="screen">
+  #editor { 
+    height:525px;
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    border-bottom-right-radius: 0px;
+    margin-top: 5px;
+  }
+  </style>
+
+</head>
+<body ng-controller="PhoneListCtrl">
+
+  <div class="container-fluid"> <!-- style="background-color:yellow;"-->
+    <div class="row-fluid containment"> <!--style = "background-color:blue;"-->
+      <div class="span2"> <!-- style="background-color:green;"-->
+        <!--Sidebar content-->
+
+        <div id="editor">function foo(items) {
+          var x = "All this is syntax highlighted";
+          return x;
+        }</div>
+
+        <script src="http://rawgithub.com/ajaxorg/ace-builds/master/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+        <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.getSession().setMode("ace/mode/javascript");
+        editor.setPrintMarginColumn(false);
+        </script>
+        
+        <!Search: <input ng-model="query">
+
+      </div>
+      <div class="span10">
+        <!--Body content-->
+
+        <ul class="phones">
+          <li ng-repeat="phone in phones | filter:query">
+            {{phone.name}}
+            <p>1 + 2 = {{1 == true}}</p>
+            <p>{{phone.snippet}}</p>
+          </li>
+        </ul>
+        <li>{{query}}</li>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

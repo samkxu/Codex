@@ -1,0 +1,66 @@
+#editor {
+    height: 400px;
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    border-bottom-right-radius: 0px;
+    margin-top: 0px;
+    position:relative;
+
+
+
+}
+
+#editor_top {
+    height: 275px;
+    border: 1px solid #DDD;
+    border-radius: 4px;
+    border-bottom-right-radius: 0px;
+    margin-top: 0px;
+
+
+}
+
+.container{
+	position:relative;
+}
+
+#console {
+	height: 100%;
+    border: 0px solid #DDD;
+    border-radius: 4px;
+    border-bottom-right-radius: 0px;
+    margin-top: 0px;
+}
+
+#sidebar {
+	height: 100%;
+	border: 0px solid #DDD;
+    border-radius: 4px;
+    border-bottom-right-radius: 0px;
+    margin-top: 0px;
+}
+
+
+html, body {
+        height: 100%;
+        width: 100%;
+        position:absolute;
+    }
+    .container-fluid{
+    	height: 100%;
+    	-moz-box-sizing: border-box;
+    	-webkit-box-sizing: border-box;
+    	box-sizing: border-box:
+    }
+.row-fluid { height: inherit; }
+
+	.col1 {
+		height:100%;
+		overflow:auto;
+	}
+body {
+    padding-top:40px;
+    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+    box-sizing: border-box;         /* Opera/IE 8+ */
+}

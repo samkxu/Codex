@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Sam</title>
+	<link rel="stylesheet" href="css/app.css">
+	<link rel="stylesheet" href="css/bootstrap.css">
+	<link rel="stylesheet" href="css/style2.css">
+
+
+
+
+</head>
+<body>
+	<div class="navbar" style="position:absolute; top:0; width:100%;">
+		<div class="navbar-inner">
+			<a class="brand" href="#">Title</a>
+			<ul class="nav">
+				<li class="active"><a href="#">Home</a></li>
+				<li><a href="#">Link</a></li>
+				<li><a href="#">Link</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row-fluid container" >
+			<div id="sidebar" class="span3 col1" style="background-color:grey">
+				<!--Sidebar-->
+				<p> hsh asfasf sfafjlsfnaj s s s s s s s  s s s ss  s s ss  hello</p>
+			</div>
+			<div id="console" class="span9" style="background-color:grey">
+				<!-- top body -->
+				<div id="editor_top">function poo(items) {
+					return 0;
+				}</div>
+
+				<div class="row-fluid">
+					<div id="editor_container">
+						<div id="editor" class="span12">function foo(items) {
+	var x = "All this is syntax highlighted";
+	return x;
+}</div>
+</div>
+					<script src="http://rawgithub.com/ajaxorg/ace-builds/master/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+					<script>
+					var editor = ace.edit("editor");
+					editor.setTheme("ace/theme/monokai");
+					editor.getSession().setMode("ace/mode/javascript");
+					editor.setPrintMarginColumn(false);
+					var editor2 = ace.edit("editor_top");
+					editor2.setTheme("ace/theme/monokai");
+					editor2.getSession().setMode("ace/mode/javascript");
+					editor2.setPrintMarginColumn(false);
+					</script>
+				</div>
+			</div>
+		</div>
+	</div>
+			
+</body>
+
+
+</html>

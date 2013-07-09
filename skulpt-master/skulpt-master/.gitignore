@@ -1,0 +1,8 @@
+support/tmp/
+doc/static/builtin.js
+doc/static/skulpt.js
+
+*.pyc
+.DS_Store
+
+/.d8_history

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Hello Goblins </title>
+</head>
+<body>
+	<script> 
+	var canvas = document.createElement("canvas");
+	var ctx = canvas.getContext("2d");
+	canvas.width = 512;
+	canvas.height = 480;
+	document.body.appendChild(canvas);
+
+			// Background image
+			var bgReady = false;
+			var bgImage = new Image();
+			bgImage.onload = function () {
+				bgReady = true;
+			};
+			bgImage.src = "background.png";
+
+			// Hero image
+			var heroReady = false;
+			var heroImage = new Image();
+			heroImage.onload = function () {
+				heroReady = true;
+			};
+			heroImage.src = "hero.png";
+
+			// Monster image
+			var monsterReady = false;
+			var monsterImage = new Image();
+			monsterImage.onload = function () {
+				monsterReady = true;
+			};
+			monsterImage.src = "monster.png";
+
+			// Game objects
+			var hero = {
+				speed: 256 // movement in pixels per second
+			};
+			var monster = {};
+			var monstersCaught = 0;
+			var ai = {};
+			ai["holyshitright"] = false;
+			ai["holyshitleft"] = false;
+			ai["holyshitup"] = false;
+			ai["holyshitdown"] = false;
+			// Handle keyboard controls
+			var keysDown = {};
+
+			addEventListener("keydown", function (e) {
+				keysDown[e.keyCode] = true;
+			}, false);
+
+			addEventListener("keyup", function (e) {
+				delete keysDown[e.keyCode];
+			}, false);
+			
+			// Reset the game when the player catches a monster
+			var reset = function () {
+				hero.x = canvas.width / 2;
+				hero.y = canvas.height / 2;
+				ai["holyshitright"] = false;
+				ai["holyshitleft"] = false;
+				ai["holyshitup"] = false;
+				ai["holyshitdown"] = false;
+				
+				// Throw the monster somewhere on the screen randomly
+				monster.x = 32 + (Math.random() * (canvas.width - 64));
+				monster.y = 32 + (Math.random() * (canvas.height - 64));
+			};
+			function Countdown(options) {
+				var timer,
+				instance = this,
+				seconds = options.seconds || 10,
+				updateStatus = options.onUpdateStatus || function () {},
+				counterEnd = options.onCounterEnd || function () {};
+
+				function decrementCounter() {
+					updateStatus(seconds);
+					if (seconds === 0) {
+						counterEnd();
+						instance.stop();
+					}
+					seconds--;
+				}
+
+				this.start = function () {
+					clearInterval(timer);
+					timer = 0;
+					seconds = options.seconds;
+					timer = setInterval(decrementCounter, 1000);
+				};
+
+				this.stop = function () {
+					clearInterval(timer);
+				};
+			}
+			var myCounter = new Countdown({  
+    			seconds:15,  // number of seconds to count down
+   				 onUpdateStatus: function(sec){console.log(sec);}, // callback for each second
+			    onCounterEnd: function(){ 
+			    	alert('Time up! You scored: ' + monstersCaught);
+			    	monstersCaught = 0;
+			    	reset();
+			    } // final action
+			});
+
+			var startagain = function() {
+				myCounter.start();
+			};
+
+			// Update game objects
+			var update = function (modifier) {
+				
+				if (38 in keysDown) { // Player holding up
+					hero.y -= hero.speed * modifier;
+					if(monster.y < hero.y) { //monster above
+						if(monster.y < 64) { //monster at top
+							//monster.y += hero.speed * modifier;
+							if(monster.x < hero.x || monster.x === hero.x) {//monster to left of hero
+								if(ai.holyshitright === true) {
+									if (hero.x - monster.x < 12) {
+										//monster.x += 2;
+									}
+									monster.x += hero.speed * modifier * 2;
+									monster.y += hero.speed * modifier;
+								}
+								else if(monster.x < 32) {// monster at topleft && running
+									if (hero.x - monster.x < 50) {
+										ai.holyshitright = true;
+									}
+
+									monster.x += hero.speed * modifier * 2;
+									monster.y += hero.speed * modifier;  //
+								}
+								else { //monster to left, but not at wall yet
+									if (hero.x - monster.x >= 32) {
+										ai.holyshitleft = false;
+									}
+									monster.x -= hero.speed * modifier;
+									monster.y += hero.speed * modifier;
+								}								
+							}
+							else if (monster.x > hero.x) { //monster to right of hero
+								if(ai.holyshitleft === true) {
+									monster.x -= hero.speed * modifier * 2;
+									monster.y += hero.speed * modifier;
+								}
+								else if (monster.x > canvas.width - 64) {//monster right wall
+									ai.holyshitleft = true;
+									monster.x -= hero.speed * modifier * 2;
+									monster.y += hero.speed * modifier;
+								}
+
+								else { // monster to right, but not wall
+									if (monster.x - hero.x > 32) {
+										ai.holyshitright = false;
+									}
+									monster.x += hero.speed * modifier;
+									monster.y += hero.speed * modifier;
+								}
+							}
+						}
+						if(monster.x < hero.x || monster.x === hero.x) {//monster to left of hero
+							if(ai.holyshitright === true) {
+								if (hero.x - monster.x < 32) {
+									//monster.x += 2;
+								}
+								monster.x += hero.speed * modifier * 2;
+								monster.y -= hero.speed * modifier;
+							}
+								else if(monster.x < 32) {// monster at leftwall
+									monster.y -= hero.speed * modifier  //
+								}
+								else { //monster to left, but not at wall yet
+									if (hero.x - monster.x >= 32) {
+										ai.holyshitleft = false;
+									}
+									monster.x -= hero.speed * modifier;
+									monster.y -= hero.speed * modifier;
+								}								
+							}
+						else if (monster.x > hero.x) { //monster to right of hero
+							if(ai.holyshitleft === true) {
+								monster.x -= hero.speed * modifier * 2;
+								monster.y -= hero.speed * modifier;
+							}
+							else if (monster.x > canvas.width - 64) {//monster right wall
+								//ai.holyshitleft = true;
+								//monster.x -= hero.speed * modifier * 2;
+								monster.y -= hero.speed * modifier;
+							}
+
+							else { // monster to right, but not wall
+								if (monster.x - hero.x > 32) {
+									ai.holyshitright = false;
+								}
+								monster.x += hero.speed * modifier;
+								monster.y -= hero.speed * modifier;
+							}
+						}
+						
+
+					}
+				}
+				if (40 in keysDown) { // Player holding down
+					hero.y += hero.speed * modifier;
+					if(monster.y > hero.y) { //monster below
+						if(monster.y > canvas.height - 64) { //monster at bottom
+							//monster.y += hero.speed * modifier;
+							if(monster.x < hero.x || monster.x === hero.x) {//monster to left of hero
+								if(ai.holyshitright === true) {
+									if (hero.x - monster.x < 12) {
+										//monster.x += 2;
+									}
+									monster.x += hero.speed * modifier * 2;
+									monster.y -= hero.speed * modifier;
+								}
+								else if(monster.x < 32) {// monster at topleft && running
+									if (hero.x - monster.x < 50) {
+										ai.holyshitright = true;
+									}
+									monster.x += hero.speed * modifier * 2;
+									monster.y -= hero.speed * modifier;  //
+								}
+								else { //monster to left, but not at wall yet
+									if (hero.x - monster.x >= 32) {
+										ai.holyshitleft = false;
+									}
+									monster.x -= hero.speed * modifier;
+									monster.y -= hero.speed * modifier;
+								}								
+							}
+							else if (monster.x > hero.x) { //monster to right of hero
+								if(ai.holyshitleft === true) {
+									monster.x -= hero.speed * modifier * 2;
+									monster.y -= hero.speed * modifier;
+								}
+								else if (monster.x > canvas.width - 64) {//monster right wall
+									if (monster.x - hero.x < 50) {
+										ai.holyshitleft = true;
+									}
+									monster.x -= hero.speed * modifier * 2;
+									monster.y -= hero.speed * modifier;
+								}
+
+								else { // monster to right, but not wall
+									if (monster.x - hero.x > 32) {
+										ai.holyshitright = false;
+									}
+									monster.x += hero.speed * modifier;
+									monster.y -= hero.speed * modifier;
+								}
+							}
+						}
+						if(monster.x < hero.x || monster.x === hero.x) {//monster to left of hero
+							if(ai.holyshitright === true) {
+								if (hero.x - monster.x < 32) {
+									//monster.x += 2;
+								}
+								monster.x += hero.speed * modifier * 2;
+								monster.y += hero.speed * modifier;
+							}
+								else if(monster.x < 32) {// monster at leftwall
+									monster.y += hero.speed * modifier  //
+								}
+								else { //monster to left, but not at wall yet
+									if (hero.x - monster.x >= 32) {
+										ai.holyshitleft = false;
+									}
+									monster.x -= hero.speed * modifier;
+									monster.y += hero.speed * modifier;
+								}								
+							}
+						else if (monster.x > hero.x) { //monster to right of hero
+							if(ai.holyshitleft === true) {
+								monster.x -= hero.speed * modifier * 2;
+								monster.y += hero.speed * modifier;
+							}
+							else if (monster.x > canvas.width - 64) {//monster right wall
+								monster.y += hero.speed * modifier;
+							}
+
+							else { // monster to right, but not wall
+								if (monster.x - hero.x > 32) {
+									ai.holyshitright = false;
+								}
+								monster.x += hero.speed * modifier;
+								monster.y += hero.speed * modifier;
+							}
+						}
+						
+
+					}
+				}
+				if (37 in keysDown) { // Player holding left
+					hero.x -= hero.speed * modifier;
+					if(monster.x < hero.x) { //monster left
+						if(monster.x < 32) { //monster at leftwall
+							//monster.y += hero.speed * modifier;
+							if(monster.y < hero.y || monster.y === hero.y) {//monster to top of hero
+								if(ai.holyshitdown === true) {
+									if (hero.y - monster.y < 12) {
+										//monster.y += 2;
+									}
+									monster.y += hero.speed * modifier * 2;
+									monster.x -= hero.speed * modifier;
+								}
+								else if(monster.y < 32) {// monster at topright && running
+									if (hero.y - monster.y < 50) {
+										ai.holyshitdown = true;
+									}
+									monster.y += hero.speed * modifier * 2;
+									monster.x -= hero.speed * modifier;  //
+								}
+								else { //monster to top, but not at wall yet
+									if (hero.y - monster.y >= 32) {
+										ai.holyshitdown = false;
+									}
+									monster.y -= hero.speed * modifier;
+									monster.x -= hero.speed * modifier;
+								}								
+							}
+							else if (monster.y > hero.y) { //monster to down of hero
+								if(ai.holyshitup === true) {
+									monster.y -= hero.speed * modifier * 2;
+									monster.x -= hero.speed * modifier;
+								}
+								else if (monster.y > canvas.width - 64) {//monster south wall
+									if (monster.y - hero.y < 50) {
+										ai.holyshitup = true;
+									}
+									monster.y -= hero.speed * modifier * 2;
+									monster.x -= hero.speed * modifier;
+								}
+
+								else { // monster to south, but not wall
+									if (monster.y - hero.y > 32) {
+										ai.holyshitup = false;
+									}
+									monster.y += hero.speed * modifier;
+									monster.x -= hero.speed * modifier;
+								}
+							}
+						}
+						if(monster.y < hero.y || monster.y === hero.y) {//monster to top of hero
+							if(ai.holyshitdown === true) {
+								if (hero.y - monster.y < 12) {
+									//monster.y += 2;
+								}
+								monster.y += hero.speed * modifier * 2;
+								monster.x += hero.speed * modifier;
+							}
+								else if(monster.y < 32) {// monster at topright && running
+									if (hero.y - monster.y < 50) {
+										ai.holyshitdown = true;
+									}
+									monster.y += hero.speed * modifier * 2;
+									monster.x += hero.speed * modifier;  //
+								}
+								else { //monster to top, but not at wall yet
+									if (hero.y - monster.y >= 32) {
+										ai.holyshitdown = false;
+									}
+									monster.y -= hero.speed * modifier;
+									monster.x += hero.speed * modifier;
+								}								
+							}
+							else if (monster.y > hero.y) { //monster to down of hero
+								if(ai.holyshitup === true) {
+									monster.y -= hero.speed * modifier * 2;
+									monster.x += hero.speed * modifier;
+								}
+								else if (monster.y > canvas.width - 64) {//monster south wall
+									if (monster.y - hero.y < 50) {
+										ai.holyshitup = true;
+									}
+									monster.y -= hero.speed * modifier * 2;
+									monster.x += hero.speed * modifier;
+								}
+
+								else { // monster to south, but not wall
+									if (monster.y - hero.y > 32) {
+										ai.holyshitup = false;
+									}
+									monster.y += hero.speed * modifier;
+									monster.x += hero.speed * modifier;
+								}
+							}
+
+
+						}
+
+				}
+				if (39 in keysDown) { // Player holding right
+					hero.x += hero.speed * modifier;
+					if(monster.x > hero.x) { //monster right
+						if(monster.x > canvas.width - 32) { //monster at right
+							//monster.y += hero.speed * modifier;
+							if(monster.y < hero.y || monster.y === hero.y) {//monster to top of hero
+								if(ai.holyshitdown === true) {
+									if (hero.y - monster.y < 12) {
+										monster.y += 2;
+									}
+									monster.y += hero.speed * modifier * 2;
+									monster.x -= hero.speed * modifier;
+								}
+								else if(monster.y < 32) {// monster at topright && running
+									if (hero.y - monster.y < 50) {
+										ai.holyshitdown = true;
+									}
+									monster.y += hero.speed * modifier * 2;
+									monster.x -= hero.speed * modifier;  //
+								}
+								else { //monster to top, but not at wall yet
+									if (hero.y - monster.y >= 32) {
+										ai.holyshitdown = false;
+									}
+									monster.y -= hero.speed * modifier;
+									monster.x -= hero.speed * modifier;
+								}								
+							}
+							else if (monster.y > hero.y) { //monster to down of hero
+								if(ai.holyshitup === true) {
+									monster.y -= hero.speed * modifier * 2;
+									monster.x -= hero.speed * modifier;
+								}
+								else if (monster.y > canvas.width - 64) {//monster south wall
+									if (monster.y - hero.y < 50) {
+										ai.holyshitup = true;
+									}
+									monster.y -= hero.speed * modifier * 2;
+									monster.x -= hero.speed * modifier;
+								}
+
+								else { // monster to south, but not wall
+									if (monster.y - hero.y > 32) {
+										ai.holyshitup = false;
+									}
+									monster.y += hero.speed * modifier;
+									monster.x -= hero.speed * modifier;
+								}
+							}
+						}
+						if(monster.y < hero.y || monster.y === hero.y) {//monster to top of hero
+							if(ai.holyshitdown === true) {
+								if (hero.y - monster.y < 12) {
+									monster.y += 2;
+								}
+								monster.y += hero.speed * modifier * 2;
+								monster.x += hero.speed * modifier;
+							}
+								else if(monster.y < 32) {// monster at topright && running
+									if (hero.y - monster.y < 50) {
+										ai.holyshitdown = true;
+									}
+									monster.y += hero.speed * modifier * 2;
+									monster.x += hero.speed * modifier;  //
+								}
+								else { //monster to top, but not at wall yet
+									if (hero.y - monster.y >= 32) {
+										ai.holyshitdown = false;
+									}
+									monster.y -= hero.speed * modifier;
+									monster.x += hero.speed * modifier;
+								}								
+							}
+							else if (monster.y > hero.y) { //monster to down of hero
+								if(ai.holyshitup === true) {
+									monster.y -= hero.speed * modifier * 2;
+									monster.x += hero.speed * modifier;
+								}
+								else if (monster.y > canvas.width - 64) {//monster south wall
+									if (monster.y - hero.y < 50) {
+										ai.holyshitup = true;
+									}
+									monster.y -= hero.speed * modifier * 2;
+									monster.x += hero.speed * modifier;
+								}
+
+								else { // monster to south, but not wall
+									if (monster.y - hero.y > 32) {
+										ai.holyshitup = false;
+									}
+									monster.y += hero.speed * modifier;
+									monster.x += hero.speed * modifier;
+								}
+							}
+
+
+						}
+					}
+
+				// Are they touching?
+				if (
+					hero.x <= (monster.x + 32)
+					&& monster.x <= (hero.x + 32)
+					&& hero.y <= (monster.y + 32)
+					&& monster.y <= (hero.y + 32)
+					) {
+					++monstersCaught;
+				reset();
+			}
+		};
+
+			// Draw everything
+			var render = function () {
+				if (bgReady) {
+					ctx.drawImage(bgImage, 0, 0);
+				}
+
+				if (heroReady) {
+					ctx.drawImage(heroImage, hero.x, hero.y);
+				}
+
+				if (monsterReady) {
+					ctx.drawImage(monsterImage, monster.x, monster.y);
+				}
+
+				// Score
+				ctx.fillStyle = "rgb(250, 250, 250)";
+				ctx.font = "24px Helvetica";
+				ctx.textAlign = "left";
+				ctx.textBaseline = "top";
+				var ddd = Math.floor(hero.x - monster.x);
+				ctx.fillText("Goblins caught: " + monstersCaught +  " h.x - m.x: " + ddd + " h: " + ai.holyshitright, 32, 32);
+			};
+
+			// The main game loop
+			var main = function () {
+				var now = Date.now();
+				var delta = now - then;
+
+				update(delta / 1000);
+				render();
+
+				then = now;
+			};
+
+			// Let's play this game!
+			reset();
+			startagain();
+			var then = Date.now();
+			setInterval(main, 1); // Execute as fast as possible			
+			</script>	
+
+		</body>
+
+		</html>
